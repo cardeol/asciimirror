@@ -183,7 +183,8 @@ var ASCIIMirror = function () {
     this.terminalSize = 80;
     var oldterminal = null;
     var tcanvas = null;
-    var fps;
+    var fps = 0;
+    var fpsHandler = null;
     var imgcanvas = null;
     var p = {};
     var matrix;    
@@ -212,13 +213,13 @@ var ASCIIMirror = function () {
     var isStreaming = false;
     var selfId = "0";
     var img_cache = {};
-    var lastLum = -1;
+    
     var signature =["      _            __ __         _                      ",
                     "     /_\\  ___  ___(_ | _)  /\\/\\ (_)_ __ _ __ ___  _ __ ",
                     "    //_\\\\/ __|/  __| | |  /    \\| | '__| '__/ _ \\| '__|",
                     "   /  _  \\__ \\  (__| | | / /\\/\\ \\ | |  | | | (_) | |   ",
-                    "   \\_/ \\_/___/\\____|_|_| \\/    \\/_|_|  |_|  \\___/|_|   "];
-                    //"   Author: Carlos De Oliveira"];
+                    "   \\_/ \\_/___/\\____|_|_| \\/    \\/_|_|  |_|  \\___/|_|   ",
+                    "   by: Carlos De Oliveira"];
     
     var task = null;
 
@@ -272,6 +273,21 @@ var ASCIIMirror = function () {
         g_ctx.textAlign = "center";
         g_ctx.font = "bold " + Math.floor(fontsize * 1.2) + "px " + fontFamily;
     }
+
+
+    this.setTerminal = function () {
+        this.terminalSize = Math.floor(this.terminalSize);
+        terminal.height = Math.floor(this.terminalSize / video_ratio);
+        terminal.width = Math.floor(terminal.height * video_ratio);
+        oldterminal = self.terminalSize;
+        matrix = new Matrix(Math.floor(terminal.width / 3), terminal.height);
+        tcanvas.width = terminal.width;
+        tcanvas.height = terminal.height;
+        tcanvas.style.display = "none";
+        video_context = tcanvas.getContext("2d");
+        img_cache = {};
+    }
+
  
     this.getVideoImage = function() {
         video_context.drawImage(video_elem, 0, 0, terminal.width, terminal.height);
@@ -380,7 +396,7 @@ var ASCIIMirror = function () {
         fps++;        
         if (now != fpsTimestamp) {
             fpsTimestamp = now;
-            document.getElementById("fps").innerHTML = Math.floor(fps);
+            if(this.fpsHandler) this.fpsHandler(Math.floor(fps));
             fps = 0;
         }         
         
@@ -412,20 +428,6 @@ var ASCIIMirror = function () {
         self.ProcessImage();        
     };
 
-    this.setTerminal = function() {
-        console.log("setTerminal");
-        this.terminalSize = Math.floor(this.terminalSize);        
-        terminal.height = Math.floor(this.terminalSize / video_ratio);
-        terminal.width = Math.floor(terminal.height * video_ratio);
-        oldterminal = self.terminalSize;
-        matrix = new Matrix(Math.floor(terminal.width / 3), terminal.height);               
-        tcanvas.width = terminal.width;
-        tcanvas.height = terminal.height;
-        tcanvas.style.display = "none";
-        video_context = tcanvas.getContext("2d");            
-        img_cache = {};
-    }
-    
     this.init = function(){
         self = this;        
         selfId = "ascii_" + new Date().getTime();
@@ -489,6 +491,10 @@ var ASCIIMirror = function () {
         
     }
 
+    this.onFpsChange = function(callback) {
+        this.fpsHandler = callback;
+    };
+
     this.startStop = function() {
         if(!isStreaming) {
             isStreaming = true;
@@ -514,11 +520,19 @@ var ASCIIMirror = function () {
 
 window.onload = function() {
     var mirror = new ASCIIMirror();
-    var gui = new dat.GUI();    
+    var gui = new dat.GUI({ autoPlace: false });
+    var datContainer = document.getElementById("dat-container");
+    var elemfps = document.getElementById("elemfps");
+    mirror.onFpsChange(function(data) {
+        elemfps.innerHTML = data + " fps";
+    });  
+    datContainer.appendChild(gui.domElement);
     gui.add(mirror, "Alpha", 0.1, 1.0);
     gui.add(mirror, "terminalSize", 50, 100);
     gui.add(mirror, "displayMode", mirror.getModes());    
     gui.add(mirror, "horizontalFlip");
     gui.add(mirror,"startStop");
     gui.add(mirror,"saveImage");
+    
+    
 }

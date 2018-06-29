@@ -264,13 +264,8 @@ var ASCIIMirror = function () {
         if (newh > screen.height - thr) {
             newh = screen.height - thr;
         }
-        if(isMobile) {            
-            console.log(screen.width, screen.height);
-            if(screen.width > screen.height) {
-                newh = screen.height - 60;
-            } else {
-                newh = screen.width;
-            }
+        if(isMobile) {                        
+            newh = screen.width > screen.height ? screen.height - 60 : screen.width;
         };
         display.height = newh;
         fontsize = Math.round(display.height / terminal.height);     

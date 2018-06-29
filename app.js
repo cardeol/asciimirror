@@ -201,6 +201,8 @@ var ASCIIMirror = function () {
     var fpsTimestamp = 0;
     var timeCheck = 0;
     var lastStyle = -1;
+    var divWarning;
+    var warningMessage = 'This site uses the webcam for rendering. Please Enable it.';
 
     var container;
     var video_elem;
@@ -247,7 +249,7 @@ var ASCIIMirror = function () {
     }
 
     this.resizeHandler = function(event) {
-        var thr = 200;
+        var thr = 350;
         var nw = document.body.clientWidth;        
         var newh = Math.floor(nw * self.winSize / video_ratio);
         if (newh > screen.height - thr) {
@@ -429,8 +431,12 @@ var ASCIIMirror = function () {
     };
 
     this.init = function(){
-        self = this;        
-        selfId = "ascii_" + new Date().getTime();
+        self = this;                
+        divWarning = document.createElement("div");
+        divWarning.className = "warningMessage";
+        divWarning.innerHTML = warningMessage;
+        
+        selfId = "ascii_" + new Date().getTime();        
         container = document.createElement("div");
         container.id = selfId + "_container";
         container.className = "asciicontainer";
@@ -473,7 +479,10 @@ var ASCIIMirror = function () {
             window.alert('getUserMedia Error');
             return;
         }
+        
         video_elem.addEventListener('canplay', function (ev) {
+            if(divWarning) divWarning.remove();
+            divWarning = null;
             video_ratio = video_elem.videoWidth / video_elem.videoHeight;            
             self.setTerminal();
             //document.body.appendChild(g_tcanvas);            
@@ -481,14 +490,14 @@ var ASCIIMirror = function () {
             pre.innerHTML = signature.join("\n");
             container.appendChild(pre);
 
-            self.resizeHandler();               
-            
-            
-            self.startStop();            
+            self.resizeHandler();                      
+            self.startStop();                        
         }, false);
 
-        window.addEventListener('resize', self.resizeHandler, true);
-        
+        setTimeout(function() {
+            if(divWarning) document.body.appendChild(divWarning);
+        }, 4000);
+        window.addEventListener('resize', self.resizeHandler, true);        
     }
 
     this.onFpsChange = function(callback) {

@@ -264,8 +264,8 @@ var ASCIIMirror = function () {
         if (newh > screen.height - thr) {
             newh = screen.height - thr;
         }
-        if(isMobile) {                        
-            newh = screen.width > screen.height ? screen.height - 60 : screen.width;
+        if(isMobile) {                                    
+            newh = screen.width > screen.height ? screen.height - 60 : screen.width - 60;
         };
         display.height = newh;
         fontsize = Math.round(display.height / terminal.height);     

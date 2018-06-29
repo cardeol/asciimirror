@@ -1,72 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title></title>
-    <link href='//fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css' />
+<head> 
+<script src="dat.gui.min.js"></script>
+<link href='//fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css' />
+<link href="styles.css" rel="stylesheet" />
 </head>
-<body>
-<style>
-body {
-    font-family: 'Ubuntu Mono';
-    font-size: 48px;
-    overflow: hidden;
-}
-}#noflash,#nocamera {
-    display: none; font-size: 18px; font-weight: bold;
-}
-
-#menu_cam {
-    display: none;
-}
-img.responsive {
-    width: 100%;
-    height: auto;
-}
-
-#content {
-    width: 100%; 
-    margin-top: 20px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-.cont {
-    width: 100%; height: auto; text-align: center;
-}
-
-.feed {
-    float:left; clear: left; padding: 10px;
-}
-
-#result {
-    margin-left: auto; 
-    margin-right: auto; 
-    height: auto; 
-    font-size: 16px;
-    /* font-family: "Courier New", Courier, monospace; */
-    /* font-family: 'Ubuntu Mono'; */
-    padding: 10px;
-}
-
-.fliph {
-    -moz-transform: scale(-1, 1);
-    -webkit-transform: scale(-1, 1);
-    -o-transform: scale(-1, 1);
-    transform: scale(-1, 1);
-    filter: FlipH;
-}
-#q {
-    background: #eee; 
-    overflow: hidden;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
-</style>
-<video id="v" style="display:none"  width="16" height="9" autoplay></video>
-<div style="width: 100%">
-    <canvas id="q">Sorry Browser Won't Support</canvas>    
-</div>
-<script type="text/javascript" src="app.js"></script>
+<body>    
+<pre style="float:left;" class="fig">
+</pre>
+<script src="app.js"></script>
+<div id="fps"></div>
 </body>
 </html>
-

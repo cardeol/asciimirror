@@ -1,11 +1,10 @@
 AsciiMirror
 ===========
 
-## Javascript ASCII mirror
 
 AsciiMirror converts a webcam video stream into ASCII ART video using different effects and customizable options.
 
-## Installing
+### Installing
 
 AsciiMirror runs on any web server or localhost (https required for video permissions on public web servers).
 

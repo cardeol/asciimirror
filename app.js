@@ -525,7 +525,7 @@ var ASCIIMirror = function () {
     }
 
     this.saveImage = function() {
-        var f = "img_" + new Date().getTime() + ".jpeg";
+        var f = "ascii_img_" + new Date().getTime() + ".jpeg";
         var e = document.createElement("a");
         e.setAttribute("href", imgcanvas.toDataURL("image/jpeg"));
         e.setAttribute("download", f);

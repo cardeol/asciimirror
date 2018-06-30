@@ -22,6 +22,10 @@ body {
     margin-top: 100px;
 }
 
+#elemfps {
+    font-size: small;
+}
+
 #dat-container {
     position: fixed;
     display: inline-block;

@@ -8,7 +8,7 @@
    by: Carlos De Oliveira
 ```
 
-AsciiMirror converts a webcam video stream into ASCII ART video using different effects and customizable options.
+AsciiMirror converts a webcam video stream into ![ASCII ART](https://en.wikipedia.org/wiki/ASCII_art) video using different effects and customizable options.
 
 ### Installing
 

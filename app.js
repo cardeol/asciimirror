@@ -252,21 +252,11 @@ var ASCIIMirror = function () {
     }
 
     this.resizeHandler = function(event) {        
-        var isMobile = window.ckeckMobile();        
-        var thr = 350;
-        var nw = document.body.clientWidth;        
-        var nh = document.body.clientHeight;
-        var newh = Math.floor(nw * self.winSize / video_ratio);
-        if (newh > screen.height - thr) {
-            newh = screen.height - thr;
-        }
-        if(isMobile) {                                    
-            newh = screen.width > screen.height ? screen.height - 60 : screen.width - 60;
-        };
-        display.height = newh;
-        fontsize = Math.round(display.height / terminal.height);     
-        //divPre.style.font =  "9px " + fontFamily;
-        display.width = terminal.width * fontsize;
+        var mw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        var mh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        display.height = Math.ceil(Math.min(mw, mh) * 0.9);                
+        fontsize = Math.floor(display.height / terminal.height);     
+        display.width = Math.ceil(terminal.width * (display.height / terminal.height));
         container.style.width = display.width + "px";
         container.style.height = display.height + "px";        
         self.generateCanvas();

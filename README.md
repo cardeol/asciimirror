@@ -15,7 +15,7 @@ AsciiMirror runs on any web server or localhost (https required for video permis
 
 ## Demo
 
-[https://carlosdeoliveira.net/asciimirror/](https://carlosdeoliveira.net/asciimirror/)
+<a target="_blank" href="https://carlosdeoliveira.net/asciimirror/">https://carlosdeoliveira.net/asciimirror/</a>
 
 ## Screenshots
 

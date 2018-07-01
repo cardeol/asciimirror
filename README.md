@@ -13,11 +13,11 @@ AsciiMirror converts a webcam's video stream into [ASCII ART](https://en.wikiped
 
 AsciiMirror runs on any web server or localhost (https required for video permissions on public web servers).
 
-## Demo
+### Demo
 
 <a target="_blank" href="https://carlosdeoliveira.net/asciimirror/">https://carlosdeoliveira.net/asciimirror/</a>
 
-## Screenshots
+### Screenshots
 
 ![Example 1](https://github.com/cardeol/asciimirror/blob/master/screenshots/ascii1.png)
 

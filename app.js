@@ -272,7 +272,7 @@ var ASCIIMirror = function () {
         g_ctx = imgcanvas.getContext("2d");
         g_ctx.textBaseline = 'middle';
         g_ctx.textAlign = "center";
-        g_ctx.font = "bold " + Math.floor(fontsize * 1.2) + "px " + fontFamily;
+        g_ctx.font = "bold " + Math.floor(fontsize * 1.1) + "px " + fontFamily;
     }
 
 

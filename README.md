@@ -1,6 +1,12 @@
-AsciiMirror
-===========
 
+```
+      _            __ __         _                      
+     /_\\  ___  ___(_ | _)  /\\/\\ (_)_ __ _ __ ___  _ __ 
+    //_\\\\/ __|/  __| | |  /    \\| | '__| '__/ _ \\| '__|
+   /  _  \\__ \\  (__| | | / /\\/\\ \\ | |  | | | (_) | |   
+   \\_/ \\_/___/\\____|_|_| \\/    \\/_|_|  |_|  \\___/|_|   
+   by: Carlos De Oliveira
+```
 
 AsciiMirror converts a webcam video stream into ASCII ART video using different effects and customizable options.
 

@@ -429,7 +429,18 @@ var ASCIIMirror = function () {
         self.ProcessImage();        
     };
 
+    var playHandler = function (ev) {
+            if(divWarning) divWarning.remove();
+            divWarning = null;
+            video_ratio = video_elem.videoWidth / video_elem.videoHeight;            
+            self.setTerminal();
+            console.log(signature.join("\n"));
+            self.resizeHandler();                      
+            self.startStop();                        
+    };
+
     this.init = function(){
+        var video_options = { video: true };
         self = this;                
         divWarning = document.createElement("div");
         divWarning.className = "warningMessage";
@@ -456,41 +467,42 @@ var ASCIIMirror = function () {
             tcanvas.id = "ascii_tcanvas";
             tcanvas.style.display = "none";         
             // document.body.appendChild(tcanvas);
-        }                
-        try {
-            navigator.getUserMedia =
-                navigator.getUserMedia ||
-                navigator.webkitGetUserMedia ||
-                navigator.mozGetUserMedia ||
-                navigator.msGetUserMedia;
-        } catch (e) {
-            window.alert('Browser not compatible with WebVideo');
-            return;
         }
-        if (navigator.getUserMedia) {
-            navigator.getUserMedia({ video: true }, function (stream) {
-                video_elem.srcObject = stream;
-            }, function (e) {
+
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia(video_options)
+            .then(function(stream) {
+               video_elem.srcObject = stream;
+               video_elem.onloadedmetadata = playHandler;
+            })
+            .catch(function(err) {
                 window.alert('Please enable your webcam');
                 return;
             });
         } else {
-            window.alert('getUserMedia Error');
-            return;
+            try {
+                navigator.getUserMedia =
+                    navigator.getUserMedia ||
+                    navigator.webkitGetUserMedia ||
+                    navigator.mozGetUserMedia ||
+                    navigator.msGetUserMedia;
+            } catch (e) {
+                window.alert('Browser not compatible with WebVideo');
+                return;
+            }        
+            if (navigator.getUserMedia) {
+                navigator.getUserMedia(video_options, function (stream) {
+                    video_elem.srcObject = stream;
+                }, function (e) {
+                    window.alert('Please enable your webcam');
+                    return;
+                });
+            } else {
+                window.alert('getUserMedia Error');
+                return;
+            }    
+            video_elem.addEventListener('canplay', playHandler, false);
         }
-        
-        video_elem.addEventListener('canplay', function (ev) {
-            if(divWarning) divWarning.remove();
-            divWarning = null;
-            video_ratio = video_elem.videoWidth / video_elem.videoHeight;            
-            self.setTerminal();
-            //document.body.appendChild(g_tcanvas);            
-            //divPre = document.createElement("pre");
-            console.log(signature.join("\n"));
-            //container.appendChild(divPre);
-            self.resizeHandler();                      
-            self.startStop();                        
-        }, false);
 
         setTimeout(function() {
             if(divWarning) document.body.appendChild(divWarning);

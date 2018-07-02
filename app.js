@@ -256,7 +256,7 @@ var ASCIIMirror = function () {
         var mh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         display.height = Math.ceil(Math.min(mw, mh) * 0.9);                
         fontsize = display.height / terminal.height;     
-        display.width = Math.ceil(terminal.width * (display.height / terminal.height));
+        display.width = Math.ceil(terminal.width * fontsize);
         container.style.width = display.width + "px";
         container.style.height = display.height + "px";        
         self.generateCanvas();

@@ -548,9 +548,8 @@ window.onload = function() {
     gui.add(mirror, "terminalSize", 40, 100);
     gui.add(mirror, "displayMode", mirror.getDisplayModes());    
     gui.add(mirror, "horizontalFlip");
-    gui.add(mirror,"startStop");
     gui.add(mirror,"saveImage");
-
+    gui.add(mirror,"startStop");
     if (checkMobile()) {
         gui.close();
     }

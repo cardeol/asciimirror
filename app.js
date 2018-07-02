@@ -506,7 +506,7 @@ var ASCIIMirror = function () {
 
         setTimeout(function() {
             if(divWarning) document.body.appendChild(divWarning);
-        }, 4000);
+        }, 5000);
         window.addEventListener('resize', self.resizeHandler, true);        
     }
 

@@ -205,7 +205,7 @@ var ASCIIMirror = function () {
     var timeCheck = 0;
     var lastStyle = -1;
     var divWarning;
-    var warningMessage = 'This site uses the webcam for rendering. Please Enable it. Google Chrome Browser is recommended.';
+    var warningMessage = 'This site uses the webcam for rendering. Please Enable it and reload the page. Google Chrome recommended.';
 
     var container;
     var video_elem;

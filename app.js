@@ -169,7 +169,7 @@ var ASCIIMirror = function () {
     ];   
 
     var i = 0;
-    var MODE = {
+    var DISPLAY_MODE = {
         Default: 0,
         TextInColor: 1,
         BackColor: 2,
@@ -180,7 +180,7 @@ var ASCIIMirror = function () {
 
     this.Alpha = 1.0;
     this.charPalette = 0;
-    this.displayMode = MODE.Default;
+    this.displayMode = DISPLAY_MODE.Default;
     this.horizontalFlip = true;
     this.winSize = 0.7;
     this.terminalSize = checkMobile() ? 55 : 80;
@@ -239,8 +239,8 @@ var ASCIIMirror = function () {
         return (chk & 0xffffffff).toString(16);
     };
 
-    this.getModes = function() {
-        return MODE;
+    this.getDisplayModes = function() {
+        return DISPLAY_MODE;
     }
 
     this.toHex = function(r,g,b) {
@@ -309,7 +309,7 @@ var ASCIIMirror = function () {
         foreColor = 'rgba(' + p.lum + ',' + p.lum + ',' + p.lum + ',' + this.Alpha + ')'; // default
         bgColor = "#FFFFFF";
 
-        if (this.displayMode == MODE.Matrix) {         
+        if (this.displayMode == DISPLAY_MODE.Matrix) {         
             if (p.x == 0 && p.y == 0) matrix.step();
             c = ci;   
             bgColor = "#000000";
@@ -330,27 +330,27 @@ var ASCIIMirror = function () {
         }
 
         
-        if (this.displayMode == MODE.BackColor) {
+        if (this.displayMode == DISPLAY_MODE.BackColor) {
             foreColor = bgColor;
             bgColor = this.toHex(p.r, p.g, p.b);
             c = ci;
         } 
 
-        if (this.displayMode == MODE.Inverted) {
+        if (this.displayMode == DISPLAY_MODE.Inverted) {
             foreColor = bgColor;
             bgColor = this.toHex(p.r, p.g, p.b);
             c = ci;
         } 
 
-        if (this.displayMode == MODE.TextInColor) {
+        if (this.displayMode == DISPLAY_MODE.TextInColor) {
             foreColor = this.toHex(p.r, p.g, p.b);
         }
 
-        if (this.displayMode == MODE.BlackInBlack) {
+        if (this.displayMode == DISPLAY_MODE.BlackInBlack) {
             foreColor = '#000000';            
         }
 
-        if (this.displayMode == MODE.Inverted) {
+        if (this.displayMode == DISPLAY_MODE.Inverted) {
             bgColor = "#000000";
             foreColor = this.toHex(p.r, p.g, p.b);
             c = ci;
@@ -546,7 +546,7 @@ window.onload = function() {
     datContainer.appendChild(gui.domElement);
     gui.add(mirror, "Alpha", 0.1, 1.0);
     gui.add(mirror, "terminalSize", 40, 100);
-    gui.add(mirror, "displayMode", mirror.getModes());    
+    gui.add(mirror, "displayMode", mirror.getDisplayModes());    
     gui.add(mirror, "horizontalFlip");
     gui.add(mirror,"startStop");
     gui.add(mirror,"saveImage");

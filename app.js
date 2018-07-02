@@ -313,6 +313,7 @@ var ASCIIMirror = function () {
             if (p.x == 0 && p.y == 0) matrix.step();
             c = ci;   
             bgColor = "#000000";
+            foreColor = "#31FF00";
             mc = matrix.get(p.x / 3, p.y);            
             if (p.x % 3 == 0 && mc !== null) {
                 c = mc;
@@ -325,9 +326,6 @@ var ASCIIMirror = function () {
                     foreColor = 'rgba(0,255,0,' + ma + ')';
                     c = matrix.getChar(p.y);                                        
                 }   
-            } else {
-                // foreColor = 'rgba(0,255,0,' + p.lum + ')';
-                foreColor = "#31FF00";
             }                               
         }
 

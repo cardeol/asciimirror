@@ -22,6 +22,10 @@ body {
     margin-top: 100px;
 }
 
+.nlink {
+    text-decoration: none;
+}
+
 #elemfps {
     font-size: small;
 }

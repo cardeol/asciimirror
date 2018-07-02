@@ -326,7 +326,7 @@ var ASCIIMirror = function () {
                     c = matrix.getChar(p.y);                                        
                 }   
             } else {
-                foreColor = 'rgba(0,255,0,' + p.lum + ')';
+                // foreColor = 'rgba(0,255,0,' + p.lum + ')';
                 foreColor = "#31FF00";
             }                               
         }

@@ -82,10 +82,10 @@ var Matrix = function (sizeX,sizeY) {
         for (j = 0; j < y; j++) {
             for (i = 0; i < x; i++) {
                 if (j == 0) {
-                    this.mtc[i + ".step"]  = this.getStep();
-                    this.mtc[i + ".pos"]   = this.getStep() * 4;
-                    this.mtc[i + ".count"] = 0;
-                    this.mtc[i + ".maxt"]  = this.getMaxT();
+                    this.mtc[crc16(i + ".step")]  = this.getStep();
+                    this.mtc[crc16(i + ".pos")]   = this.getStep() * 4;
+                    this.mtc[crc16(i + ".count")] = 0;
+                    this.mtc[crc16(i + ".maxt")]  = this.getMaxT();
                 }
                 this.mtc[i + ',' +j] = null;
             }
@@ -110,7 +110,7 @@ var Matrix = function (sizeX,sizeY) {
     }
 
     this.get = function(x,y) {
-        if(this.mtc[x + "," + y]) return this.mtc[x + "," + y];
+        if(this.mtc[crc16(x + "," + y)]) return this.mtc[crc16(x + "," + y)];
         return null;
     }
 
@@ -118,7 +118,7 @@ var Matrix = function (sizeX,sizeY) {
         var str = "";
         for (j = 0; j < this.mtc.mh; j++) {
             for (i = 0; i < this.mtc.mw; i++) {
-                str += this.mtc[i + "," + j] + " ";
+                str += this.mtc[crc16(i + "," + j)] + " ";
             }
             str += "\n";
         }
@@ -132,10 +132,10 @@ var Matrix = function (sizeX,sizeY) {
         var c;
         var maxt;
         for (i = 0; i < this.mtc.mw; i++) {
-            count = this.mtc[i + ".count"];
-            pos = this.mtc[i + ".pos"];
-            step = this.mtc[i + ".step"];
-            maxt = this.mtc[i + ".maxt"];
+            count = this.mtc[crc16(i + ".count")];
+            pos = this.mtc[crc16(i + ".pos")];
+            step = this.mtc[crc16(i + ".step")];
+            maxt = this.mtc[crc16(i + ".maxt")];
             if (count++ > step) {
                 count = 0;
                 pos++;
@@ -146,17 +146,17 @@ var Matrix = function (sizeX,sizeY) {
                 step = this.getStep();
                 maxt = this.getMaxT();
             }
-            this.mtc[i + ".count"] = count;
-            this.mtc[i + ".step"] = step;
-            this.mtc[i + ".pos"] = pos;
-            this.mtc[i + ".maxt"] = maxt;
+            this.mtc[crc16(i + ".count")] = count;
+            this.mtc[crc16(i + ".step")] = step;
+            this.mtc[crc16(i + ".pos")] = pos;
+            this.mtc[crc16(i + ".maxt")] = maxt;
             for (j = 0; j < this.mtc.mh; j++) {
                 c = null;
                 if (j < pos && j >= pos - maxt) {
                     c = Math.floor(((maxt + 1) - (pos - j)) * 9 / maxt);
                 }
                 if (j == pos) c = "*";
-                this.mtc[i + ','+ j] = c
+                this.mtc[crc16(i + ','+ j)] = c
             }
         }
     }

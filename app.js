@@ -314,7 +314,7 @@ var ASCIIMirror = function () {
         tcanvas.height = terminal.height;
         tcanvas.style.display = "none";
         video_context = tcanvas.getContext("2d");
-        img_cache = {};
+        for (var k in img_cache) delete img_cache[k]; 
     }
 
  
@@ -343,6 +343,7 @@ var ASCIIMirror = function () {
             bgColor = "#000000";
             foreColor = "#31FF00";
             mc = matrix.get(p.x / 3, p.y);            
+            foreColor = this.toHex(0, p.lum, 0);
             if (p.x % 3 == 0 && mc !== null) {
                 c = mc;
                 if (mc == "*") {                                        
@@ -353,7 +354,7 @@ var ASCIIMirror = function () {
                     foreColor = 'rgba(0,255,0,' + ma + ')';
                     c = matrix.getChar(p.y);                                        
                 }   
-            }                               
+            } 
         }
         
         if (this.displayMode == DISPLAY_MODE.BackColor) {
@@ -377,13 +378,15 @@ var ASCIIMirror = function () {
         }
 
         if (this.displayMode == DISPLAY_MODE.Hercules) {
-            foreColor = '#FF7F00';            ;
+            foreColor = '#FF7F00';
+            // foreColor = foreColor = this.toHex(255, Math.round((p.r + p.g + p.g) / 6), 0);
             bgColor = '#000000';
             c = ci;
         }
 
         if (this.displayMode == DISPLAY_MODE.MSDOS) {
-            foreColor = '#FFFFFF';            ;
+            foreColor = '#FFFFFF';
+            foreColor = this.toHex(p.lum, p.lum, p.lum);  
             bgColor = '#0000FF';
             c = ci;
         }
@@ -399,7 +402,8 @@ var ASCIIMirror = function () {
         if (img_cache[cKey]) return --img_cache[cKey]; else img_cache[cKey] = 5;
 
         if (lastStyle != this.displayMode) {
-            for(var k in img_cache) delete img_cache[k]; // better than empty the object? 
+            // dilema: delete all keys or empty object for gb collector ?
+            for(var k in img_cache) delete img_cache[k]; 
             lastStyle = this.displayMode;
             g_ctx.fillStyle = bgColor;
             g_ctx.fillRect(0, 0, display.width, display.height);
@@ -428,11 +432,7 @@ var ASCIIMirror = function () {
             this.resizeHandler();
             lastStyle = -1;
         }
-        if (now - timeCheck > 5) {                        
-            for(var k in img_cache) delete img_cache[k]; // not for gb collector
-            timeCheck = now;            
-        }
-        
+                
         fps++;        
         if (now != fpsTimestamp) {
             fpsTimestamp = now;

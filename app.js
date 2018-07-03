@@ -299,10 +299,9 @@ var ASCIIMirror = function () {
         f[FONT_TYPE.Monospace] ="Monospace",
         f[FONT_TYPE.Terminal] = "Terminal"
         var fsize = Math.floor(fontsize * 1);
-        var ret = [fsize + "px", f[self.FontFamily]];
-        if(self.BoldFont) ret.unshift("Bold");
-        console.log(ret);
-        return ret.join(" ");
+        var ret = [f[self.FontFamily], fsize + "px"];
+        if(self.BoldFont) ret.push("Bold");        
+        return ret.reverse().join(" ");
     }
 
     this.setTerminal = function () {

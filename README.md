@@ -7,7 +7,7 @@
    \_/ \_/___/\____|_|_| \/    \/_|_|  |_|  \___/|_|      
 ```
 
-AsciiMirror converts a webcam's video stream into [ASCII ART](https://en.wikipedia.org/wiki/ASCII_art) video using different effects and customizable options.
+AsciiMirror is a tribute to Old-School computing. It converts a webcam's video stream into [ASCII ART](https://en.wikipedia.org/wiki/ASCII_art) video using multiple effects and customizable options.
 
 ### Installing
 

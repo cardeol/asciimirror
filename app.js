@@ -253,8 +253,9 @@ var ASCIIMirror = function () {
     }
 
     this.resizeHandler = function(event) {        
+        var menusize = document.getElementById("menubar").offsetHeight + 10; 
         var mw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-        var mh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        var mh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - menusize;
         display.height = Math.ceil(Math.min(mw, mh) * (checkMobile() ? 1 : 0.9));                
         fontsize = display.height / terminal.height;     
         display.width = Math.ceil(terminal.width * fontsize);
@@ -464,14 +465,13 @@ var ASCIIMirror = function () {
             video_elem.id = "ascii_videoin";
             video_elem.style.display = "none";
             video_elem.id = "ascii_videoin";
-            video_elem.style.display = "none";
-            //document.body.appendChild(video_elem);
+            video_elem.style.display = "none";            
         }
+
         if (tcanvas == null) {
             tcanvas = document.createElement("canvas");
             tcanvas.id = "ascii_tcanvas";
-            tcanvas.style.display = "none";         
-            // document.body.appendChild(tcanvas);
+            tcanvas.style.display = "none";                     
         }
 
         if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {

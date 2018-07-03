@@ -171,10 +171,10 @@ var ASCIIMirror = function () {
     var DISPLAY_MODE = {
         Default: 0,
         TextInColor: 1,
-        BackColor: 2,
-        Matrix : 3,
-        Inverted: 4,
-        BlackInBlack: 5
+        Classic: 2,
+        BackColor: 3,
+        Matrix : 4,
+        Inverted: 5       
     }
 
     this.Alpha = 1.0;
@@ -343,7 +343,7 @@ var ASCIIMirror = function () {
             foreColor = this.toHex(p.r, p.g, p.b);
         }
 
-        if (this.displayMode == DISPLAY_MODE.BlackInBlack) {
+        if (this.displayMode == DISPLAY_MODE.Classic) {
             foreColor = '#000000';            
         }
 

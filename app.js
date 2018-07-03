@@ -169,19 +169,29 @@ var ASCIIMirror = function () {
 
     var i = 0;
     var DISPLAY_MODE = {
-        Default: i++,
-        TextInColor: i++,
-        Classic: i++,
-        Hercules: i++,
-        MSDOS: i++,
-        BackColor: i++,
-        Matrix : i++,
-        Inverted: i++
+        "Default": i++,
+        "TextInColor": i++,
+        "Classic": i++,
+        "Hercules": i++,
+        "MSDOS": i++,
+        "BackColor": i++,
+        "Matrix" : i++,
+        "Inverted": i++
     }
 
+    var FONT_TYPE = {
+        "Inconsolata": i++,
+        "Lucida": i++,
+        "Monaco": i++,
+        "Monospace": i++,
+        "Terminal": i++
+    }
+    
     this.Alpha = 1.0;
     this.charPalette = 0;
     this.displayMode = DISPLAY_MODE.Default;
+    this.FontFamily = FONT_TYPE.Inconsolata;
+    this.BoldFont = false;
     this.horizontalFlip = true;
     this.winSize = 0.7;
     this.terminalSize = checkMobile() ? 55 : 80;
@@ -200,11 +210,11 @@ var ASCIIMirror = function () {
         width: this.terminalSize,
         height: 0
     }
-    //var fontFamily = "Arial";
-    var fontFamily = "Inconsolata";
+    
     var fpsTimestamp = 0;
     var timeCheck = 0;
     var lastStyle = -1;
+    var lastFont = null;
     var divWarning;
     var warningMessage = 'This site uses the webcam for rendering. Please Enable it and reload the page. Google Chrome recommended.';
 
@@ -244,6 +254,10 @@ var ASCIIMirror = function () {
         return DISPLAY_MODE;
     }
 
+    this.getFontTypes = function() {
+        return FONT_TYPE;
+    }
+
     this.toHex = function(r,g,b) {
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
@@ -274,9 +288,22 @@ var ASCIIMirror = function () {
         g_ctx = imgcanvas.getContext("2d");
         g_ctx.textBaseline = 'middle';
         g_ctx.textAlign = "center";
-        g_ctx.font = "bold " + Math.floor(fontsize * 1.1) + "px " + fontFamily;
+        g_ctx.font = self.getFont();
     }
 
+    this.getFont = function() {
+        var f = {};        
+        f[FONT_TYPE.Inconsolata] = "Inconsolata";
+        f[FONT_TYPE.Lucida] = "Lucida Console",
+        f[FONT_TYPE.Monaco] = "Monaco",
+        f[FONT_TYPE.Monospace] ="Monospace",
+        f[FONT_TYPE.Terminal] = "Terminal"
+        var fsize = Math.floor(fontsize * 1);
+        var ret = [fsize + "px", f[self.FontFamily]];
+        if(self.BoldFont) ret.unshift("Bold");
+        console.log(ret);
+        return ret.join(" ");
+    }
 
     this.setTerminal = function () {
         this.terminalSize = Math.floor(this.terminalSize);
@@ -390,6 +417,13 @@ var ASCIIMirror = function () {
         var charSet = charList[self.charPalette];
 
         var now = Math.floor(new Date().getTime() / 1000);
+
+        var currentfont = [self.FontFamily , self.BoldFont].join(",");
+        if(lastFont != currentfont) {
+            oldterminal = -1;
+            lastFont = currentfont;
+        }
+        
         if(oldterminal != this.terminalSize) {
             this.setTerminal();
             this.resizeHandler();
@@ -558,7 +592,9 @@ window.onload = function() {
     });  
     datContainer.appendChild(gui.domElement);
     gui.add(mirror, "Alpha", 0.1, 1.0);
-    gui.add(mirror, "terminalSize", 40, 100);
+    gui.add(mirror, "terminalSize", 40, 120);
+    gui.add(mirror, "FontFamily", mirror.getFontTypes());
+    gui.add(mirror, "BoldFont");
     gui.add(mirror, "displayMode", mirror.getDisplayModes());    
     gui.add(mirror, "horizontalFlip");
     gui.add(mirror,"saveImage");

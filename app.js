@@ -212,7 +212,6 @@ var ASCIIMirror = function () {
     }
     
     var fpsTimestamp = 0;
-    var timeCheck = 0;
     var lastStyle = -1;
     var lastFont = null;
     var divWarning;
@@ -463,9 +462,9 @@ var ASCIIMirror = function () {
         return true;
     }
 
-    var render = function(t) {        
-        task = window.requestAnimationFrame(render);
+    var render = function(t) {                
         self.ProcessImage();        
+        task = window.requestAnimationFrame(render);
     };
 
     var playHandler = function (ev) {
@@ -600,6 +599,5 @@ window.onload = function() {
     gui.add(mirror,"startStop");
     if (checkMobile()) {
         gui.close();
-    }
-    
-}
+    }    
+};

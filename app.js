@@ -191,7 +191,7 @@ var ASCIIMirror = function () {
     this.charPalette = 0;
     this.displayMode = DISPLAY_MODE.Default;
     this.FontFamily = FONT_TYPE.Inconsolata;
-    this.BoldFont = false;
+    this.BoldFont = true;
     this.horizontalFlip = true;
     this.winSize = 0.7;
     this.terminalSize = checkMobile() ? 55 : 80;
@@ -385,7 +385,6 @@ var ASCIIMirror = function () {
 
         if (this.displayMode == DISPLAY_MODE.MSDOS) {
             foreColor = '#FFFFFF';
-            foreColor = this.toHex(p.lum, p.lum, p.lum);  
             bgColor = '#0000FF';
             c = ci;
         }

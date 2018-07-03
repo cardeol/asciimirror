@@ -169,12 +169,14 @@ var ASCIIMirror = function () {
 
     var i = 0;
     var DISPLAY_MODE = {
-        Default: 0,
-        TextInColor: 1,
-        Classic: 2,
-        BackColor: 3,
-        Matrix : 4,
-        Inverted: 5       
+        Default: i++,
+        TextInColor: i++,
+        Classic: i++,
+        Hercules: i++,
+        MSDOS: i++,
+        BackColor: i++,
+        Matrix : i++,
+        Inverted: i++
     }
 
     this.Alpha = 1.0;
@@ -345,6 +347,18 @@ var ASCIIMirror = function () {
 
         if (this.displayMode == DISPLAY_MODE.Classic) {
             foreColor = '#000000';            
+        }
+
+        if (this.displayMode == DISPLAY_MODE.Hercules) {
+            foreColor = '#FF7F00';            ;
+            bgColor = '#000000';
+            c = ci;
+        }
+
+        if (this.displayMode == DISPLAY_MODE.MSDOS) {
+            foreColor = '#FFFFFF';            ;
+            bgColor = '#0000FF';
+            c = ci;
         }
 
         if (this.displayMode == DISPLAY_MODE.Inverted) {

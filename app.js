@@ -291,7 +291,7 @@ var ASCIIMirror = function () {
     }
 
  
-    this.getVideoImage = function() {
+    this.getVideoFrame = function() {
         video_context.drawImage(video_elem, 0, 0, terminal.width, terminal.height);
         return video_context.getImageData(0, 0, terminal.width, terminal.height).data;
     }
@@ -406,7 +406,7 @@ var ASCIIMirror = function () {
             fps = 0;
         }         
         
-        cData = this.getVideoImage();
+        cData = this.getVideoFrame();
         cslength = charSet.length;
 
         for (var y = 0; y < terminal.height; y++) {

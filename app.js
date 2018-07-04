@@ -578,7 +578,7 @@ window.onload = function() {
         elemfps.innerHTML = data + " fps";
     });  
     datContainer.appendChild(gui.domElement);
-    // gui.add(mirror, "Alpha", 0.1, 1.0);
+    
     gui.add(mirror, "terminalSize", 40, 120);
     gui.add(mirror, "FontFamily", mirror.getFontTypes());
     gui.add(mirror, "BoldFont");

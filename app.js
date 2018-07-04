@@ -326,6 +326,7 @@ function ASCIIMirror() {
         var a = this.alpha;
         var cx = (p.x * fontsize) + (fontsize / 2); 
         var cy = ((p.y * fontsize) + (fontsize / 2));        
+        var cacheLoop = Math.floor(this.terminalSize  / 12);
         
         foreColor = 'rgba(' + p.lum + ',' + p.lum + ',' + p.lum + ',' + this.Alpha + ')';
         bgColor = "#FFFFFF";
@@ -391,7 +392,7 @@ function ASCIIMirror() {
 
         cKey = crc16([c, foreColor, bgColor].join(".")); 
 
-        if (img_cache[cKey]) return --img_cache[cKey]; else img_cache[cKey] = 5;
+        if (img_cache[cKey]) return --img_cache[cKey]; else img_cache[cKey] = cacheLoop;
 
         if (lastState != currentState) {
             for(var k in img_cache) delete img_cache[k]; 

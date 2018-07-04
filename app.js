@@ -1,9 +1,13 @@
+/* jshint browser: true */
 /**
  * ACIIMirror
  * Carlos De Oliveira cardeol@gmail.com
  * 
  */
-'use strict';
+
+ (function() {
+    'use strict';
+ })();
 
 var crcTable = [
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5,
@@ -63,9 +67,13 @@ function crc16(s) { // crc16 fast version
     return ((crc ^ 0) & 0xFFFF);
 }
 
-var Matrix = function (x,y) {
+function checkMobile() {    
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);    
+}
+
+function Matrix(sizeX,sizeY) {
     
-    this.mtc = {};
+    this.mtc = {}; // coordinates in O(1)
     var i, j, matrixChars = "#£&%R38@0€".split("");    
     var maxStep = 6;
 
@@ -76,12 +84,12 @@ var Matrix = function (x,y) {
         for (j = 0; j < y; j++) {
             for (i = 0; i < x; i++) {
                 if (j == 0) {
-                    this.mtc[i + ".step"] = this.getStep();
-                    this.mtc[i + ".pos"] = this.getStep()*4;
-                    this.mtc[i + ".count"] = 0;
-                    this.mtc[i + ".maxt"] = this.getMaxT();
+                    this.mtc[crc16(i + ".step")]  = this.getStep();
+                    this.mtc[crc16(i + ".pos")]   = this.getStep() * 4;
+                    this.mtc[crc16(i + ".count")] = 0;
+                    this.mtc[crc16(i + ".maxt")]  = this.getMaxT();
                 }
-                this.mtc[i + "," + j] = null;
+                this.mtc[i + ',' +j] = null;
             }
         }        
         if(x>70) maxStep = 6;
@@ -93,32 +101,21 @@ var Matrix = function (x,y) {
             return matrixChars[ n % matrixChars.length];
         }
         return matrixChars[Math.floor(Math.random() * matrixChars.length)];
-    }
+    };
 
     this.getMaxT = function () {
         return Math.floor(Math.random() * 6) + 3;
-    }
+    };
 
     this.getStep = function () {
         return Math.floor(Math.random() * maxStep) + 1;
-    }
+    };
 
     this.get = function(x,y) {
-        if(this.mtc[x + "," + y]) return this.mtc[x + "," + y];
+        if(this.mtc[crc16(x + "," + y)]) return this.mtc[crc16(x + "," + y)];
         return null;
-    }
-
-    this.display = function (elem) {
-        var str = "";
-        for (j = 0; j < this.mtc.mh; j++) {
-            for (i = 0; i < this.mtc.mw; i++) {
-                str += this.mtc[i + "," + j] + " ";
-            }
-            str += "\n";
-        }
-        if(elem) elem.innerHTML = str;
-    }
-
+    };
+   
     this.step = function () {
         var count;
         var pos;
@@ -126,83 +123,93 @@ var Matrix = function (x,y) {
         var c;
         var maxt;
         for (i = 0; i < this.mtc.mw; i++) {
-            count = this.mtc[i + ".count"];
-            pos = this.mtc[i + ".pos"];
-            step = this.mtc[i + ".step"];
-            maxt = this.mtc[i + ".maxt"];
-            count++;
-            if (count > step) {
+            count = this.mtc[crc16(i + ".count")];
+            pos = this.mtc[crc16(i + ".pos")];
+            step = this.mtc[crc16(i + ".step")];
+            maxt = this.mtc[crc16(i + ".maxt")];
+            if (count++ > step) {
                 count = 0;
                 pos++;
             }
             if (pos > this.mtc.mh + maxt) {
-                pos = this.getStep();
+                pos = this.getStep() * 4;
                 count = 0;
                 step = this.getStep();
                 maxt = this.getMaxT();
             }
-            this.mtc[i + ".count"] = count;
-            this.mtc[i + ".step"] = step;
-            this.mtc[i + ".pos"] = pos;
-            this.mtc[i + ".maxt"] = maxt;
+            this.mtc[crc16(i + ".count")] = count;
+            this.mtc[crc16(i + ".step")] = step;
+            this.mtc[crc16(i + ".pos")] = pos;
+            this.mtc[crc16(i + ".maxt")] = maxt;
             for (j = 0; j < this.mtc.mh; j++) {
                 c = null;
                 if (j < pos && j >= pos - maxt) {
                     c = Math.floor(((maxt + 1) - (pos - j)) * 9 / maxt);
                 }
-                if (j == pos) {
-                    c = "*";
-                }
-                this.mtc[i + "," + j] = c
+                if (j == pos) c = "*";
+                this.mtc[crc16(i + ','+ j)] = c
             }
         }
     }
-    this.init(x,y);
+    this.init(sizeX,sizeY);
 };
 
-var ASCIIMirror = function () {
+function ASCIIMirror() {
+    
     var charList = [
         ("#WKDGLftji+;,:. ").split("")       
     ];   
 
     var i = 0;
-    var MODE = {
-        Default: 0,
-        TextInColor: 1,
-        BackColor: 2,
-        Matrix : 3,
-        Inverted: 4,
-        BlackInBlack: 5
-    }
+    var DISPLAY_MODE = {
+        "Default": i++,
+        "TextInColor": i++,
+        "Classic": i++,
+        "Hercules": i++,
+        "MSDOS": i++,
+        "BackColor": i++,
+        "Matrix" : i++,
+        "Inverted": i++
+    };
 
+    var FONT_TYPE = {
+        "Inconsolata": i++,
+        "Lucida": i++,
+        "Monaco": i++,
+        "Monospace": i++,
+        "Terminal": i++
+    };
+    
     this.Alpha = 1.0;
     this.charPalette = 0;
-    this.displayMode = MODE.Default;
+    this.displayMode = DISPLAY_MODE.Default;
+    this.FontFamily = FONT_TYPE.Inconsolata;
+    this.BoldFont = true;
     this.horizontalFlip = true;
     this.winSize = 0.7;
-    this.terminalSize = 80;
-    var oldterminal = null;
+    this.terminalSize = checkMobile() ? 55 : 80;
+    this.fpsHandler = null;
+
+    var lastState = null;
     var tcanvas = null;
-    var fps = 0;
-    var fpsHandler = null;
+    var fps = 0;    
     var imgcanvas = null;
     var p = {};
     var matrix;    
+    
     var display = {
         width: 0,
         height: 0
-    }
+    };
+
     var terminal = {
         width: this.terminalSize,
         height: 0
-    }
-    //var fontFamily = "Arial";
-    var fontFamily = "Inconsolata";
+    };
+    
     var fpsTimestamp = 0;
-    var timeCheck = 0;
-    var lastStyle = -1;
     var divWarning;
-    var warningMessage = 'This site uses the webcam for rendering. Please Enable it.';
+    var warningMessage = 'This site uses the webcam for rendering. Please Enable it and reload the page. Google Chrome recommended.';
 
     var container;
     var video_elem;
@@ -236,32 +243,33 @@ var ASCIIMirror = function () {
         return (chk & 0xffffffff).toString(16);
     };
 
-    this.getModes = function() {
-        return MODE;
-    }
+    this.getDisplayModes = function() {
+        return DISPLAY_MODE;
+    };
+
+    this.getFontTypes = function() {
+        return FONT_TYPE;
+    };
 
     this.toHex = function(r,g,b) {
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-    }
+    };
 
     this.toInverseHex = function(r,g,b) {
         return '#' + componentToHex(255 - r) + componentToHex(255 - g) + componentToHex(255 - b);
-    }
+    };
 
-    this.resizeHandler = function(event) {
-        var thr = 350;
-        var nw = document.body.clientWidth;        
-        var newh = Math.floor(nw * self.winSize / video_ratio);
-        if (newh > screen.height - thr) {
-            newh = screen.height - thr;
-        }
-        display.height = newh;
-        fontsize = Math.round(display.height / terminal.height);     
-        display.width = terminal.width * fontsize;
+    this.resizeHandler = function(event) {        
+        var menusize = document.getElementById("menubar").offsetHeight + 10; 
+        var mw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        var mh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - menusize;
+        display.height = Math.ceil(Math.min(mw, mh) * (checkMobile() ? 1 : 0.9));                
+        fontsize = display.height / terminal.height;     
+        display.width = Math.ceil(terminal.width * fontsize);
         container.style.width = display.width + "px";
         container.style.height = display.height + "px";        
         self.generateCanvas();
-    }
+    };
 
        
     this.generateCanvas = function() {        
@@ -273,9 +281,21 @@ var ASCIIMirror = function () {
         g_ctx = imgcanvas.getContext("2d");
         g_ctx.textBaseline = 'middle';
         g_ctx.textAlign = "center";
-        g_ctx.font = "bold " + Math.floor(fontsize * 1.2) + "px " + fontFamily;
-    }
+        g_ctx.font = self.getFont();
+    };
 
+    this.getFont = function() {
+        var f = {};        
+        f[FONT_TYPE.Inconsolata] = "Inconsolata";
+        f[FONT_TYPE.Lucida] = "Lucida Console";
+        f[FONT_TYPE.Monaco] = "Monaco";
+        f[FONT_TYPE.Monospace] ="Monospace";
+        f[FONT_TYPE.Terminal] = "Terminal";
+        var fsize = Math.floor(fontsize * 1);
+        var ret = [f[self.FontFamily], fsize + "px"];
+        if(self.BoldFont) ret.push("Bold");        
+        return ret.reverse().join(" ");
+    };
 
     this.setTerminal = function () {
         this.terminalSize = Math.floor(this.terminalSize);
@@ -287,37 +307,39 @@ var ASCIIMirror = function () {
         tcanvas.height = terminal.height;
         tcanvas.style.display = "none";
         video_context = tcanvas.getContext("2d");
-        img_cache = {};
-    }
+        for (var k in img_cache) delete img_cache[k]; 
+    };
 
  
-    this.getVideoImage = function() {
+    this.getVideoFrame = function() {
         video_context.drawImage(video_elem, 0, 0, terminal.width, terminal.height);
         return video_context.getImageData(0, 0, terminal.width, terminal.height).data;
-    }
+    };
 
     this.getLuminance = function(r,g,b) {
         return Math.round(0.2126 * r + 0.7152 * g + 0.0722 * b);
         //return Math.round(0.299 * r + 0.587 * g + 0.114 * b);                
-    }
+    };
 
-    this.drawChar = function (c,ci) {
+    this.drawChar = function (c,ci, currentState) {
         var cKey,bgColor, foreColor, ma, mc;
         var a = this.alpha;
         var cx = (p.x * fontsize) + (fontsize / 2); 
-        var cy = ((p.y * fontsize) + (fontsize / 2));
+        var cy = ((p.y * fontsize) + (fontsize / 2));        
+        var cacheLoop = Math.floor(this.terminalSize  / 12);
         
-        foreColor = 'rgba(' + p.lum + ',' + p.lum + ',' + p.lum + ',' + this.Alpha + ')'; // default
+        foreColor = 'rgba(' + p.lum + ',' + p.lum + ',' + p.lum + ',' + this.Alpha + ')';
         bgColor = "#FFFFFF";
 
-        if (this.displayMode == MODE.Matrix) {         
+        if (this.displayMode == DISPLAY_MODE.Matrix) {         
             if (p.x == 0 && p.y == 0) matrix.step();
             c = ci;   
-            bgColor = "#000000";
+            bgColor = "#000000";                        
+            //foreColor = "#31FF00";
+            foreColor = this.toHex(0, p.lum, 0);
             mc = matrix.get(p.x / 3, p.y);            
             if (p.x % 3 == 0 && mc !== null) {
                 c = mc;
-                //img_cache[cKey] = 0;
                 if (mc == "*") {                                        
                     foreColor = "#00FF00";
                     c = matrix.getChar();                    
@@ -326,53 +348,58 @@ var ASCIIMirror = function () {
                     foreColor = 'rgba(0,255,0,' + ma + ')';
                     c = matrix.getChar(p.y);                                        
                 }   
-            } else {
-                foreColor = 'rgba(0,255,0,' + p.lum + ')';
-                foreColor = "#31FF00";
-            }                               
+            } 
         }
-
         
-        if (this.displayMode == MODE.BackColor) {
+        if (this.displayMode == DISPLAY_MODE.BackColor) {
             foreColor = bgColor;
             bgColor = this.toHex(p.r, p.g, p.b);
             c = ci;
         } 
 
-        if (this.displayMode == MODE.Inverted) {
+        if (this.displayMode == DISPLAY_MODE.Inverted) {
             foreColor = bgColor;
             bgColor = this.toHex(p.r, p.g, p.b);
             c = ci;
         } 
 
-        if (this.displayMode == MODE.TextInColor) {
+        if (this.displayMode == DISPLAY_MODE.TextInColor) {
             foreColor = this.toHex(p.r, p.g, p.b);
         }
 
-        if (this.displayMode == MODE.BlackInBlack) {
+        if (this.displayMode == DISPLAY_MODE.Classic) {
             foreColor = '#000000';            
         }
 
-        if (this.displayMode == MODE.Inverted) {
+        if (this.displayMode == DISPLAY_MODE.Hercules) {
+            foreColor = '#FF7F00';
+            // foreColor = foreColor = this.toHex(255, Math.round((p.r + p.g + p.g) / 6), 0);
+            bgColor = '#000000';
+            c = ci;
+        }
+
+        if (this.displayMode == DISPLAY_MODE.MSDOS) {
+            foreColor = '#FFFFFF';
+            bgColor = '#0000FF';
+            c = ci;
+        }
+
+        if (this.displayMode == DISPLAY_MODE.Inverted) {
             bgColor = "#000000";
             foreColor = this.toHex(p.r, p.g, p.b);
             c = ci;
         }
 
-        cKey = crc16([c, foreColor, bgColor].join("."));
-        if (img_cache[cKey]) {
-            img_cache[cKey]--;
-            return false;
-        }
-        img_cache[cKey] = 5;
+        cKey = crc16([c, foreColor, bgColor].join(".")); 
 
-        if (lastStyle != this.displayMode) {
-            img_cache = {};
-            lastStyle = this.displayMode;
+        if (img_cache[cKey]) return --img_cache[cKey]; else img_cache[cKey] = cacheLoop;
+
+        if (lastState != currentState) {
+            for(var k in img_cache) delete img_cache[k]; 
             g_ctx.fillStyle = bgColor;
             g_ctx.fillRect(0, 0, display.width, display.height);
+            lastState = currentState;
         }
-
 
         g_ctx.fillStyle = bgColor;
         g_ctx.fillRect(p.x * fontsize, p.y * fontsize, fontsize, fontsize); 
@@ -380,33 +407,33 @@ var ASCIIMirror = function () {
         g_ctx.fillText(c, cx, cy); 
     };
 
+    this.getState = function() {
+        return crc16([ this.terminalSize, this.FontFamily, this.BoldFont, this.displayMode ].join("."));
+    };
+
     this.ProcessImage = function() {          
         var x, y, iOffset, cIndex, cData, cslength, c, ci;
         var charSet = charList[self.charPalette];
+        var currentState = this.getState();
 
         var now = Math.floor(new Date().getTime() / 1000);
-        if(oldterminal != this.terminalSize) {
-            this.setTerminal();
-            this.resizeHandler();
-            lastStyle = -1;
-        }
-        if (now - timeCheck > 5) {                        
-            for(var k in img_cache) delete img_cache[k]; // not for gb collector
-            timeCheck = now;            
-        }
-        
         fps++;        
         if (now != fpsTimestamp) {
             fpsTimestamp = now;
-            if(this.fpsHandler) this.fpsHandler(Math.floor(fps));
+            if(this.fpsHandler) this.fpsHandler(Math.round(fps));
             fps = 0;
         }         
+                               
+        if(lastState != currentState) {
+            this.setTerminal();
+            this.resizeHandler();            
+        }        
         
-        cData = this.getVideoImage();
-        cslength = charSet.length;
+        cData = this.getVideoFrame();
+        cslength = charSet.length;        
 
-        for (var y = 0; y < terminal.height; y++) {
-            for (var x = 0; x < terminal.width; x++) {
+        for (y = 0; y < terminal.height; y++) {
+            for (x = 0; x < terminal.width; x++) {
                 iOffset = (y * terminal.width + (this.horizontalFlip ? terminal.width - x - 1: x)) * 4;
                 p.x = x;
                 p.y = y;
@@ -418,19 +445,30 @@ var ASCIIMirror = function () {
                 cIndex = Math.round((p.lum / 255) * (cslength - 1));                   
                 c = charSet[cIndex]; 
                 ci = charSet[cslength - 1 - cIndex];                              
-                self.drawChar(c,ci);                  
+                self.drawChar(c, ci, currentState);                  
             }
         }     
-                                       
+                       
         return true;
-    }
+    };
 
-    var render = function(t) {        
-        task = window.requestAnimationFrame(render);
+    var render = function(t) {                
         self.ProcessImage();        
+        task = window.requestAnimationFrame(render);
+    };
+
+    var playHandler = function (ev) {
+            if(divWarning) divWarning.remove();
+            divWarning = null;
+            video_ratio = video_elem.videoWidth / video_elem.videoHeight;            
+            self.setTerminal();
+            console.log(signature.join("\n"));
+            self.resizeHandler();                      
+            self.startStop();                        
     };
 
     this.init = function(){
+        var video_options = { video: true };
         self = this;                
         divWarning = document.createElement("div");
         divWarning.className = "warningMessage";
@@ -449,56 +487,60 @@ var ASCIIMirror = function () {
             video_elem.id = "ascii_videoin";
             video_elem.style.display = "none";
             video_elem.id = "ascii_videoin";
-            video_elem.style.display = "none";
-            //document.body.appendChild(video_elem);
+            video_elem.style.display = "none";            
         }
+
         if (tcanvas == null) {
             tcanvas = document.createElement("canvas");
             tcanvas.id = "ascii_tcanvas";
-            tcanvas.style.display = "none";         
-            // document.body.appendChild(tcanvas);
-        }                
-        try {
-            navigator.getUserMedia =
-                navigator.getUserMedia ||
-                navigator.webkitGetUserMedia ||
-                navigator.mozGetUserMedia ||
-                navigator.msGetUserMedia;
-        } catch (e) {
-            window.alert('Browser not compatible with WebVideo');
-            return;
+            tcanvas.style.display = "none";                     
         }
-        if (navigator.getUserMedia) {
-            navigator.getUserMedia({ video: true }, function (stream) {
-                video_elem.srcObject = stream;
-            }, function (e) {
+
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia(video_options)
+            .then(function(stream) {
+               video_elem.srcObject = stream;
+               video_elem.onloadedmetadata = playHandler;
+            })
+            .catch(function(err) {
                 window.alert('Please enable your webcam');
                 return;
             });
         } else {
-            window.alert('getUserMedia Error');
-            return;
+            // fallback other browsers
+            try {
+                navigator.getUserMedia =
+                    navigator.getUserMedia ||
+                    navigator.webkitGetUserMedia ||
+                    navigator.mozGetUserMedia ||
+                    navigator.msGetUserMedia;
+            } catch (e) {
+                window.alert('Browser not compatible with WebVideo');
+                return;
+            }        
+            if (navigator.getUserMedia) {
+                navigator.getUserMedia(video_options, function (stream) {
+                    video_elem.srcObject = stream;
+                }, function (e) {
+                    window.alert('Please enable your webcam');
+                    return;
+                });
+            } else {
+                window.alert('getUserMedia Error');
+                return;
+            }    
+            video_elem.addEventListener('canplay', playHandler, false);
         }
-        
-        video_elem.addEventListener('canplay', function (ev) {
-            if(divWarning) divWarning.remove();
-            divWarning = null;
-            video_ratio = video_elem.videoWidth / video_elem.videoHeight;            
-            self.setTerminal();
-            //document.body.appendChild(g_tcanvas);            
-            var pre = document.createElement("pre");
-            pre.innerHTML = signature.join("\n");
-            container.appendChild(pre);
-
-            self.resizeHandler();                      
-            self.startStop();                        
-        }, false);
 
         setTimeout(function() {
             if(divWarning) document.body.appendChild(divWarning);
-        }, 4000);
+        }, 5000);
+        // resize events
         window.addEventListener('resize', self.resizeHandler, true);        
-    }
+        if("onorientationchange" in window) {
+            window.addEventListener('onorientationchange', self.resizeHandler, false);        
+        }
+    };
 
     this.onFpsChange = function(callback) {
         this.fpsHandler = callback;
@@ -514,18 +556,18 @@ var ASCIIMirror = function () {
             cancelAnimationFrame(task);
             isStreaming = false;
         }
-    }
+    };
 
     this.saveImage = function() {
-        var f = "img_" + new Date().getTime() + ".jpeg";
+        var f = "ascii_img_" + new Date().getTime() + ".jpeg";
         var e = document.createElement("a");
         e.setAttribute("href", imgcanvas.toDataURL("image/jpeg"));
         e.setAttribute("download", f);
         e.click();
-    }
+    };
 
     this.init();
-};
+}
 
 window.onload = function() {
     var mirror = new ASCIIMirror();
@@ -536,12 +578,15 @@ window.onload = function() {
         elemfps.innerHTML = data + " fps";
     });  
     datContainer.appendChild(gui.domElement);
-    gui.add(mirror, "Alpha", 0.1, 1.0);
-    gui.add(mirror, "terminalSize", 50, 100);
-    gui.add(mirror, "displayMode", mirror.getModes());    
+    // gui.add(mirror, "Alpha", 0.1, 1.0);
+    gui.add(mirror, "terminalSize", 40, 120);
+    gui.add(mirror, "FontFamily", mirror.getFontTypes());
+    gui.add(mirror, "BoldFont");
+    gui.add(mirror, "displayMode", mirror.getDisplayModes());    
     gui.add(mirror, "horizontalFlip");
-    gui.add(mirror,"startStop");
     gui.add(mirror,"saveImage");
-    
-    
-}
+    gui.add(mirror,"startStop");
+    if (checkMobile()) {
+        gui.close();
+    }    
+};

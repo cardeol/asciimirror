@@ -1,9 +1,13 @@
+/* jshint browser: true */
 /**
  * ACIIMirror
  * Carlos De Oliveira cardeol@gmail.com
  * 
  */
-'use strict';
+
+ (function() {
+    'use strict';
+ })();
 
 var crcTable = [
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5,
@@ -63,12 +67,11 @@ function crc16(s) { // crc16 fast version
     return ((crc ^ 0) & 0xFFFF);
 }
 
-// device detection
 function checkMobile() {    
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);    
-};
+}
 
-var Matrix = function (sizeX,sizeY) {
+function Matrix(sizeX,sizeY) {
     
     this.mtc = {}; // coordinates in O(1)
     var i, j, matrixChars = "#£&%R38@0€".split("");    
@@ -98,32 +101,21 @@ var Matrix = function (sizeX,sizeY) {
             return matrixChars[ n % matrixChars.length];
         }
         return matrixChars[Math.floor(Math.random() * matrixChars.length)];
-    }
+    };
 
     this.getMaxT = function () {
         return Math.floor(Math.random() * 6) + 3;
-    }
+    };
 
     this.getStep = function () {
         return Math.floor(Math.random() * maxStep) + 1;
-    }
+    };
 
     this.get = function(x,y) {
         if(this.mtc[crc16(x + "," + y)]) return this.mtc[crc16(x + "," + y)];
         return null;
-    }
-
-    this.display = function (elem) {
-        var str = "";
-        for (j = 0; j < this.mtc.mh; j++) {
-            for (i = 0; i < this.mtc.mw; i++) {
-                str += this.mtc[crc16(i + "," + j)] + " ";
-            }
-            str += "\n";
-        }
-        if(elem) elem.innerHTML = str;
-    }
-
+    };
+   
     this.step = function () {
         var count;
         var pos;
@@ -162,7 +154,8 @@ var Matrix = function (sizeX,sizeY) {
     this.init(sizeX,sizeY);
 };
 
-var ASCIIMirror = function () {
+function ASCIIMirror() {
+    
     var charList = [
         ("#WKDGLftji+;,:. ").split("")       
     ];   
@@ -177,7 +170,7 @@ var ASCIIMirror = function () {
         "BackColor": i++,
         "Matrix" : i++,
         "Inverted": i++
-    }
+    };
 
     var FONT_TYPE = {
         "Inconsolata": i++,
@@ -185,7 +178,7 @@ var ASCIIMirror = function () {
         "Monaco": i++,
         "Monospace": i++,
         "Terminal": i++
-    }
+    };
     
     this.Alpha = 1.0;
     this.charPalette = 0;
@@ -195,25 +188,26 @@ var ASCIIMirror = function () {
     this.horizontalFlip = true;
     this.winSize = 0.7;
     this.terminalSize = checkMobile() ? 55 : 80;
-    var oldterminal = null;
+    this.fpsHandler = null;
+
+    var lastState = null;
     var tcanvas = null;
-    var fps = 0;
-    var fpsHandler = null;
+    var fps = 0;    
     var imgcanvas = null;
     var p = {};
     var matrix;    
+    
     var display = {
         width: 0,
         height: 0
-    }
+    };
+
     var terminal = {
         width: this.terminalSize,
         height: 0
-    }
+    };
     
     var fpsTimestamp = 0;
-    var lastStyle = -1;
-    var lastFont = null;
     var divWarning;
     var warningMessage = 'This site uses the webcam for rendering. Please Enable it and reload the page. Google Chrome recommended.';
 
@@ -251,19 +245,19 @@ var ASCIIMirror = function () {
 
     this.getDisplayModes = function() {
         return DISPLAY_MODE;
-    }
+    };
 
     this.getFontTypes = function() {
         return FONT_TYPE;
-    }
+    };
 
     this.toHex = function(r,g,b) {
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-    }
+    };
 
     this.toInverseHex = function(r,g,b) {
         return '#' + componentToHex(255 - r) + componentToHex(255 - g) + componentToHex(255 - b);
-    }
+    };
 
     this.resizeHandler = function(event) {        
         var menusize = document.getElementById("menubar").offsetHeight + 10; 
@@ -275,7 +269,7 @@ var ASCIIMirror = function () {
         container.style.width = display.width + "px";
         container.style.height = display.height + "px";        
         self.generateCanvas();
-    }
+    };
 
        
     this.generateCanvas = function() {        
@@ -288,20 +282,20 @@ var ASCIIMirror = function () {
         g_ctx.textBaseline = 'middle';
         g_ctx.textAlign = "center";
         g_ctx.font = self.getFont();
-    }
+    };
 
     this.getFont = function() {
         var f = {};        
         f[FONT_TYPE.Inconsolata] = "Inconsolata";
-        f[FONT_TYPE.Lucida] = "Lucida Console",
-        f[FONT_TYPE.Monaco] = "Monaco",
-        f[FONT_TYPE.Monospace] ="Monospace",
-        f[FONT_TYPE.Terminal] = "Terminal"
+        f[FONT_TYPE.Lucida] = "Lucida Console";
+        f[FONT_TYPE.Monaco] = "Monaco";
+        f[FONT_TYPE.Monospace] ="Monospace";
+        f[FONT_TYPE.Terminal] = "Terminal";
         var fsize = Math.floor(fontsize * 1);
         var ret = [f[self.FontFamily], fsize + "px"];
         if(self.BoldFont) ret.push("Bold");        
         return ret.reverse().join(" ");
-    }
+    };
 
     this.setTerminal = function () {
         this.terminalSize = Math.floor(this.terminalSize);
@@ -314,24 +308,24 @@ var ASCIIMirror = function () {
         tcanvas.style.display = "none";
         video_context = tcanvas.getContext("2d");
         for (var k in img_cache) delete img_cache[k]; 
-    }
+    };
 
  
     this.getVideoFrame = function() {
         video_context.drawImage(video_elem, 0, 0, terminal.width, terminal.height);
         return video_context.getImageData(0, 0, terminal.width, terminal.height).data;
-    }
+    };
 
     this.getLuminance = function(r,g,b) {
         return Math.round(0.2126 * r + 0.7152 * g + 0.0722 * b);
         //return Math.round(0.299 * r + 0.587 * g + 0.114 * b);                
-    }
+    };
 
-    this.drawChar = function (c,ci) {
+    this.drawChar = function (c,ci, currentState) {
         var cKey,bgColor, foreColor, ma, mc;
         var a = this.alpha;
         var cx = (p.x * fontsize) + (fontsize / 2); 
-        var cy = ((p.y * fontsize) + (fontsize / 2));
+        var cy = ((p.y * fontsize) + (fontsize / 2));        
         
         foreColor = 'rgba(' + p.lum + ',' + p.lum + ',' + p.lum + ',' + this.Alpha + ')';
         bgColor = "#FFFFFF";
@@ -339,10 +333,10 @@ var ASCIIMirror = function () {
         if (this.displayMode == DISPLAY_MODE.Matrix) {         
             if (p.x == 0 && p.y == 0) matrix.step();
             c = ci;   
-            bgColor = "#000000";
-            foreColor = "#31FF00";
-            mc = matrix.get(p.x / 3, p.y);            
+            bgColor = "#000000";                        
+            //foreColor = "#31FF00";
             foreColor = this.toHex(0, p.lum, 0);
+            mc = matrix.get(p.x / 3, p.y);            
             if (p.x % 3 == 0 && mc !== null) {
                 c = mc;
                 if (mc == "*") {                                        
@@ -399,12 +393,11 @@ var ASCIIMirror = function () {
 
         if (img_cache[cKey]) return --img_cache[cKey]; else img_cache[cKey] = 5;
 
-        if (lastStyle != this.displayMode) {
-            // dilema: delete all keys or empty object for gb collector ?
+        if (lastState != currentState) {
             for(var k in img_cache) delete img_cache[k]; 
-            lastStyle = this.displayMode;
             g_ctx.fillStyle = bgColor;
             g_ctx.fillRect(0, 0, display.width, display.height);
+            lastState = currentState;
         }
 
         g_ctx.fillStyle = bgColor;
@@ -413,36 +406,33 @@ var ASCIIMirror = function () {
         g_ctx.fillText(c, cx, cy); 
     };
 
+    this.getState = function() {
+        return crc16([ this.terminalSize, this.FontFamily, this.BoldFont, this.displayMode ].join("."));
+    };
+
     this.ProcessImage = function() {          
         var x, y, iOffset, cIndex, cData, cslength, c, ci;
         var charSet = charList[self.charPalette];
+        var currentState = this.getState();
 
         var now = Math.floor(new Date().getTime() / 1000);
-
-        var currentfont = [self.FontFamily , self.BoldFont].join(",");
-        if(lastFont != currentfont) {
-            oldterminal = -1;
-            lastFont = currentfont;
-        }
-        
-        if(oldterminal != this.terminalSize) {
-            this.setTerminal();
-            this.resizeHandler();
-            lastStyle = -1;
-        }
-                
         fps++;        
         if (now != fpsTimestamp) {
             fpsTimestamp = now;
-            if(this.fpsHandler) this.fpsHandler(Math.floor(fps));
+            if(this.fpsHandler) this.fpsHandler(Math.round(fps));
             fps = 0;
         }         
+                               
+        if(lastState != currentState) {
+            this.setTerminal();
+            this.resizeHandler();            
+        }        
         
         cData = this.getVideoFrame();
-        cslength = charSet.length;
+        cslength = charSet.length;        
 
-        for (var y = 0; y < terminal.height; y++) {
-            for (var x = 0; x < terminal.width; x++) {
+        for (y = 0; y < terminal.height; y++) {
+            for (x = 0; x < terminal.width; x++) {
                 iOffset = (y * terminal.width + (this.horizontalFlip ? terminal.width - x - 1: x)) * 4;
                 p.x = x;
                 p.y = y;
@@ -454,12 +444,12 @@ var ASCIIMirror = function () {
                 cIndex = Math.round((p.lum / 255) * (cslength - 1));                   
                 c = charSet[cIndex]; 
                 ci = charSet[cslength - 1 - cIndex];                              
-                self.drawChar(c,ci);                  
+                self.drawChar(c, ci, currentState);                  
             }
         }     
-                                       
+                       
         return true;
-    }
+    };
 
     var render = function(t) {                
         self.ProcessImage();        
@@ -548,9 +538,8 @@ var ASCIIMirror = function () {
         window.addEventListener('resize', self.resizeHandler, true);        
         if("onorientationchange" in window) {
             window.addEventListener('onorientationchange', self.resizeHandler, false);        
-        };
-
-    }
+        }
+    };
 
     this.onFpsChange = function(callback) {
         this.fpsHandler = callback;
@@ -566,7 +555,7 @@ var ASCIIMirror = function () {
             cancelAnimationFrame(task);
             isStreaming = false;
         }
-    }
+    };
 
     this.saveImage = function() {
         var f = "ascii_img_" + new Date().getTime() + ".jpeg";
@@ -574,10 +563,10 @@ var ASCIIMirror = function () {
         e.setAttribute("href", imgcanvas.toDataURL("image/jpeg"));
         e.setAttribute("download", f);
         e.click();
-    }
+    };
 
     this.init();
-};
+}
 
 window.onload = function() {
     var mirror = new ASCIIMirror();
